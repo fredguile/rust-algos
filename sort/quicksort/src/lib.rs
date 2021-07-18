@@ -1,58 +1,119 @@
-pub fn quicksort(arr: &mut [i32]) {
-    if arr.len() < 3 {
+pub fn quicksort1(arr: &mut [i32]) {
+    if arr.len() < 2 {
         return;
     }
 
-    let pivot = arr[arr.len() / 2];
-
-    let index = partition(arr, pivot);
-    quicksort(&mut arr[..index]);
-    quicksort(&mut arr[index..]);
+    let index = luomo_partition(arr);
+    quicksort1(&mut arr[..index]);
+    quicksort1(&mut arr[index + 1..]);
 }
 
-fn partition(arr: &mut [i32], pivot: i32) -> usize {
-    let mut i = 0usize;
-    let mut j = arr.len() - 1;
+fn luomo_partition(arr: &mut [i32]) -> usize {
+    let pivot = arr[arr.len() - 1]; // last
+    let mut i = 0;
 
-    loop {
-        while arr[i] < pivot {
+    for j in 0..arr.len() - 1 {
+        if arr[j] < pivot {
+            arr.swap(i, j);
             i += 1;
         }
+    }
 
-        while arr[j] > pivot {
-            j -= 1;
+    arr.swap(i, arr.len() - 1);
+    i
+}
+
+pub fn quicksort2(arr: &mut [i32]) {
+    if arr.len() < 2 {
+        return;
+    }
+
+    let index = hoare_partition(arr);
+    quicksort2(&mut arr[..index + 1]);
+    quicksort2(&mut arr[index + 1..]);
+}
+
+fn hoare_partition(arr: &mut [i32]) -> usize {
+    let pivot_index = ((arr.len() - 1) as f32 / 2.0).floor() as usize; // floor
+    let pivot = arr[pivot_index];
+    let mut i = -1isize;
+    let mut j = arr.len();
+
+    loop {
+        loop {
+            i += 1;
+            if arr[i as usize] >= pivot {
+                break;
+            }
         }
 
-        if i >= j || arr[i] == arr[j] {
+        loop {
+            j -= 1;
+            if arr[j] <= pivot {
+                break;
+            }
+        }
+
+        if i as usize >= j {
             break j;
         }
 
-        arr.swap(i, j);
+        arr.swap(i as usize, j);
     }
 }
 
 #[cfg(test)]
-mod tests {
-    use crate::quicksort;
+pub mod tests {
+    use rand::distributions::Uniform;
+    use rand::{self, Rng};
+
+    use super::{quicksort1, quicksort2};
 
     #[test]
-    fn it_sorts_1() {
-        let mut arr = vec![15, 3, 7];
-        quicksort(&mut arr);
-        assert_eq!(&arr[..], [3, 7, 15]);
+    pub fn quicksort1_works() {
+        let rng = &mut rand::thread_rng();
+
+        for _ in 0..5000 {
+            let len = rng.gen::<usize>() % 32;
+            let mut v = rng
+                .sample_iter(Uniform::new(0, 100))
+                .take(len + 1)
+                .collect::<Vec<i32>>();
+            let original = &v.to_owned();
+
+            quicksort1(&mut v);
+            for i in 0..v.len() - 1 {
+                assert!(
+                    v[i] <= v[i + 1],
+                    "array not sorted: {:?} got instead: {:?}",
+                    &original,
+                    &v
+                );
+            }
+        }
     }
 
     #[test]
-    fn it_sorts_2() {
-        let mut arr = vec![4, 5, 3, 55, 7, 23, 54, 7];
-        quicksort(&mut arr);
-        assert_eq!(&arr[..], [3, 4, 5, 7, 7, 23, 54, 55]);
-    }
+    pub fn quicksort2_works() {
+        let rng = &mut rand::thread_rng();
 
-    #[test]
-    fn it_sorts_3() {
-        let mut arr = vec![16, 15, 22, 100, 1, 7, 3, 100];
-        quicksort(&mut arr);
-        assert_eq!(&arr[..], [1, 3, 7, 15, 16, 22, 100, 100]);
+        for _ in 0..5000 {
+            let len = rng.gen::<usize>() % 32;
+            let mut v = rng
+                .sample_iter(Uniform::new(0, 100))
+                .take(len + 1)
+                .collect::<Vec<i32>>();
+            let original = &v.to_owned();
+
+            quicksort2(&mut v);
+            for i in 0..v.len() - 1 {
+                assert!(
+                    v[i] <= v[i + 1],
+                    "array not sorted: {:?} got instead: {:?}",
+                    &original,
+                    &v
+                );
+            }
+        }
     }
 }
