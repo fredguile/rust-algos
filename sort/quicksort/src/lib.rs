@@ -65,13 +65,13 @@ fn hoare_partition(arr: &mut [i32]) -> usize {
 #[cfg(test)]
 pub mod tests {
     use rand::distributions::Uniform;
-    use rand::{self, Rng};
+    use rand::{self, thread_rng, Rng};
 
     use super::{quicksort1, quicksort2};
 
     #[test]
     pub fn quicksort1_works() {
-        let rng = &mut rand::thread_rng();
+        let rng = &mut thread_rng();
 
         for _ in 0..5000 {
             let len = rng.gen::<usize>() % 32;
