@@ -1,13 +1,17 @@
 pub fn bubblesort(arr: &mut [i32]) {
+    let mut counter = 0usize;
+
     loop {
         let mut swapped = false;
 
-        for i in 1..arr.len() {
+        for i in 1..arr.len() - counter {
             if arr[i - 1] > arr[i] {
                 arr.swap(i - 1, i);
                 swapped = true;
             }
         }
+
+        counter += 1;
 
         if !swapped {
             break;
