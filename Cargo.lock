@@ -27,6 +27,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "huffman-coding"
+version = "0.1.0"
+dependencies = [
+ "rand",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.98"
 source = "registry+https://github.com/rust-lang/crates.io-index"
